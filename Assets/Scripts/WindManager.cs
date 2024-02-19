@@ -76,6 +76,7 @@ public class WindManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI timerText;
     [SerializeField] private TextMeshProUGUI similarityText;
     [SerializeField] private GameObject endPanel;
+    [SerializeField] private Text moveTimerText;
 
     public GameObject kasa_Port;
     private Quaternion kasaVector;
@@ -85,13 +86,14 @@ public class WindManager : MonoBehaviour
     private float judgeTime = 3;
     private bool changeOnce = false;
 
-    private const int UP_READY_TIME = 7;
+    private const int UP_READY_TIME = 4;
     public bool upFinish = false;
 
     private void Start()
     {
         judgeTimer = 0;
         endPanel.SetActive(false);
+        moveTimerText.enabled = false;
         /*
         Vector3 oculusForward = InputTracking.GetLocalRotation(XRNode.CenterEye) * Vector3.forward;
         player.transform.rotation = Quaternion.LookRotation(oculusForward, Vector3.up);*/
@@ -108,7 +110,7 @@ public class WindManager : MonoBehaviour
         {
             heightText.enabled = false;
             timerText.enabled = false;
-            similarityText.enabled = false; ;
+            similarityText.enabled = false;
         }
 
         if (spManager == null)
@@ -216,18 +218,6 @@ public class WindManager : MonoBehaviour
         }
 
         // １秒前に一致していない状態にする
-        if (timer > windCicleTime - 1)
-        {
-            isMatching = false;　// 念のため
-            isMatchingFinal = false;
-            changeOnce = false;
-            judgeTimer = 0;
-            if (upFinish == false)
-            {
-                upFinish = true;
-                Debug.Log("上昇中なら上昇終了準備");
-            }
-        }
     }
 
     private void FixedUpdate()
@@ -240,6 +230,8 @@ public class WindManager : MonoBehaviour
         {
             if (player.transform.position.y > startUpHeight && !up)
             {
+                Debug.Log(isMatchingFinal);
+
                 timer += Time.deltaTime;
 
                 //Debug.Log("timer:"+timer+"windCicleTime:"+windCicleTime);
@@ -249,80 +241,122 @@ public class WindManager : MonoBehaviour
                     timer = 0;
                 }
                 // 上昇準備中と上昇中は操作を受け付けないようにする
-                if (sendToHardUpSignal == false)
+                //if (sendToHardUpSignal == false)
+                //{
+                //Debug.Log("操作を受け付ける");
+                float similarity;
+                similarity = Vector3.Dot(rightControllerTilt.normalized, windXZDirection[currentWindIndex].normalized);
+                // 類似度が0.7よりおおきいとき
+                //Debug.Log(similarity);
+                similarityText.text = similarity.ToString();
+                if (similarity >= similarityStandard)
                 {
-                    //Debug.Log("操作を受け付ける");
-                    float similarity;
-                    similarity = Vector3.Dot(rightControllerTilt.normalized, windXZDirection[currentWindIndex].normalized);
-                    // 類似度が0.7よりおおきいとき
-                    //Debug.Log(similarity);
-                    similarityText.text = similarity.ToString();
-                    if (similarity >= similarityStandard)
+                    isMatching = true;
+                    moveTimerText.enabled = true;
+                    moveTimerText.text = judgeTimer.ToString("f1");
+
+                    if (timer > windCicleTime - 1)
                     {
-                        isMatching = true;
-                        Vector3 directionVector = new Vector3(currentWind.x, upVelocity, currentWind.z);
-                        playerRigidbody.velocity = directionVector * speed;
+                        //isMatching = false;　// 念のため
+                        isMatchingFinal = false;
+                        moveTimerText.enabled = false;
+                        changeOnce = false;
+                        judgeTimer = 0;
+                        //if (upFinish == false)
+                        //{
+                        //   upFinish = true;
+                        // Debug.Log("上昇中なら上昇終了準備");
+                        //}
                     }
-                    // 類似していなければ
-                    else
+
+                    if (isMatchingFinal == true)
                     {
-                        isMatching = false;
-                        // おちていく
-                        playerRigidbody.velocity = downVeclocity;
+                        moveTimerText.enabled = false;
+                        Vector3 directionVector = new Vector3(currentWind.x * speed, upVelocity, currentWind.z * speed);
+                        playerRigidbody.velocity = directionVector;
                     }
                 }
+                // 類似していなければ
                 else
+                {
+                    moveTimerText.enabled = false;
+                    isMatching = false;
+                    // おちていく
+                    playerRigidbody.velocity = downVeclocity;
+                }
+                //}
+                /*else
                 {
                     Debug.Log(timer + "操作を受け付けない");
                     playerRigidbody.velocity = downVeclocity;
-                }
+                }*/
             }
             else
             {
                 Debug.Log(timer + "操作を受け付けない");
             }
             // 上昇する7秒前にハード側に信号を送る 110+7 117
-            if (startUpHeight + UP_READY_TIME * 1 > transform.position.y)
+            /*if (startUpHeight + UP_READY_TIME * 1 > transform.position.y)
             {
+                judgeTimer = 0;
+
+                moveTimerText.enabled = true;
+                moveTimerText.text = "上昇準備中";
+
                 // 信号を送る
                 Debug.Log("上昇準備開始 : 上昇中");
                 //Debug.Log("下に落ちる速度" + 1 + "上昇準備の高さ：" + UP_READY_TIME * 1);
                 //Debug.Log("上昇開始位置：" + (startUpHeight + UP_READY_TIME * 1));
                 sendToHardUpSignal = true;
                 upFinish = false;// 上昇が始まる
-            }
+            }*/
             // 5mから20mまで上昇
-            if (player.transform.position.y < startUpHeight)
+            /*if (player.transform.position.y < startUpHeight)
             {
                 up = true;
                 Debug.Log("上昇中");
-            }
+            }*/
             // 20mまで上昇したらとまる
-            if (player.transform.position.y > upHeight && up)
+            /*if (player.transform.position.y > upHeight && up)
             {
+                //上昇しきったらマッチングフラグをリセット
+                isMatching = false;
+                isMatchingFinal = false;
+
+                moveTimerText.enabled = false;
+
                 up = false;
                 //upOnce = false;
                 sendToHardUpSignal = false;
-            }
+
+                currentWind = currentWindDirection();
+                SetWindEffectDirection(currentWindIndex);
+                changeOnce = false;
+                timer = 0;
+                upFinish = true;
+            }*/
             // 上昇中
-            if (up)
+            /*if (up)
             {
+                moveTimerText.enabled = true;
+                moveTimerText.text = "上昇中";
+
                 currentWindIndex = 0;
                 playerRigidbody.velocity = windDirection[currentWindIndex] * upPower;
                 SetActiveWindDirection(currentWindIndex);
                 SetWindEffectDirection(currentWindIndex);
-                /*
-                if (upOnce == false)
-                {
-                    currentWindIndex = 0;
+
+                //if (upOnce == false)
+                //{
+                //    currentWindIndex = 0;
                     // Debug.Log("力を加える");
                     //playerRigidbody.AddForce(windDirection[0], ForceMode.Impulse);
                     //playerRigidbody.velocity = windDirection[0];
                     // 風向きを音とエフェクトで提示
-                    windMovement.WindMove(currentWindIndex);
-                    upOnce = true;
-                }*/
-            }
+                  //  windMovement.WindMove(currentWindIndex);
+                   // upOnce = true;
+                //}
+            }*/
         }
         else
         {

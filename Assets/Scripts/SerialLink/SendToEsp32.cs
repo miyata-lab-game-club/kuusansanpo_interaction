@@ -195,68 +195,101 @@ public class SendToEsp32 : MonoBehaviour
         */
         // 上：全部あいてる
         // 上昇準備＆上昇中じゃなかったら
-        if (windManager.sendToHardUpSignal == false)
+        //if (windManager.sendToHardUpSignal == false)
+        //{
+        //Debug.Log(windManager.isMatchingFinal);
+        if (windManager.isMatchingFinal == true)
         {
-            //Debug.Log(windManager.isMatchingFinal);
-            if (windManager.isMatchingFinal == true)
+            if (LF_UnderCap == UNDER_FULL＿OPEN)
             {
-                if (LF_UnderCap == UNDER_FULL＿OPEN)
-                {
-                    LF_AboveCap = ABOVE_CLOSE;
-                }
-                /*else if (LF_UnderCap == UNDER_CLOSE)
-                {
-                    LF_AboveCap = ABOVE_FULL＿OPEN;
-                }*/
-                if (RF_UnderCap == UNDER_FULL＿OPEN)
-                {
-                    RF_AboveCap = ABOVE_CLOSE;
-                }/*
+                LF_AboveCap = ABOVE_CLOSE;
+            }
+            /*else if (LF_UnderCap == UNDER_CLOSE)
+            {
+                LF_AboveCap = ABOVE_FULL＿OPEN;
+            }*/
+            if (RF_UnderCap == UNDER_FULL＿OPEN)
+            {
+                RF_AboveCap = ABOVE_CLOSE;
+            }/*
                 else if (RF_UnderCap == UNDER_CLOSE)
                 {
                     RF_AboveCap = ABOVE_FULL＿OPEN;
                 }*/
-                if (RB_UnderCap == UNDER_FULL＿OPEN)
-                {
-                    Debug.Log("aaa");
-                    RB_AboveCap = ABOVE_CLOSE;
-                }/*
+            if (RB_UnderCap == UNDER_FULL＿OPEN)
+            {
+                Debug.Log("aaa");
+                RB_AboveCap = ABOVE_CLOSE;
+            }/*
                 else if (RB_UnderCap == UNDER_CLOSE)
                 {
                     RB_AboveCap = ABOVE_FULL＿OPEN;
                 }*/
-                if (LB_UnderCap == UNDER_FULL＿OPEN)
-                {
-                    LB_AboveCap = ABOVE_CLOSE;
-                }
-                /*else if (LB_UnderCap == UNDER_CLOSE)
-                {
-                    LB_AboveCap = ABOVE_FULL＿OPEN;
-                }*/
-            }
-            else
+            if (LB_UnderCap == UNDER_FULL＿OPEN)
             {
-                if (LF_UnderCap == UNDER_FULL＿OPEN)
-                {
-                    LF_AboveCap = ABOVE_FULL＿OPEN;
-                }
-                if (RF_UnderCap == UNDER_FULL＿OPEN)
-                {
-                    RF_AboveCap = ABOVE_FULL＿OPEN;
-                }
-                if (RB_UnderCap == UNDER_FULL＿OPEN)
-                {
-                    // Debug.Log("bbb");
-                    RB_AboveCap = ABOVE_FULL＿OPEN;
-                }
-                if (LB_UnderCap == UNDER_FULL＿OPEN)
-                {
-                    LB_AboveCap = ABOVE_FULL＿OPEN;
-                }
+                LB_AboveCap = ABOVE_CLOSE;
             }
+            /*else if (LB_UnderCap == UNDER_CLOSE)
+            {
+                LB_AboveCap = ABOVE_FULL＿OPEN;
+            }*/
         }
-        // 上昇準備 & 上昇中だったら
         else
+        {
+            if (LF_UnderCap == UNDER_FULL＿OPEN)
+            {
+                LF_AboveCap = ABOVE_FULL＿OPEN;
+            }
+            if (RF_UnderCap == UNDER_FULL＿OPEN)
+            {
+                RF_AboveCap = ABOVE_FULL＿OPEN;
+            }
+            if (RB_UnderCap == UNDER_FULL＿OPEN)
+            {
+                // Debug.Log("bbb");
+                RB_AboveCap = ABOVE_FULL＿OPEN;
+            }
+            if (LB_UnderCap == UNDER_FULL＿OPEN)
+            {
+                LB_AboveCap = ABOVE_FULL＿OPEN;
+            }
+            /*if (LF_UnderCap == UNDER_FULL＿OPEN)
+            {
+                LF_AboveCap = ABOVE_CLOSE;
+            }
+            else if (LF_UnderCap == UNDER_CLOSE)
+            {
+                LF_AboveCap = ABOVE_FULL＿OPEN;
+            }
+            if (RF_UnderCap == UNDER_FULL＿OPEN)
+            {
+                RF_AboveCap = ABOVE_CLOSE;
+            }
+            else if (RF_UnderCap == UNDER_CLOSE)
+            {
+                RF_AboveCap = ABOVE_FULL＿OPEN;
+            }
+            if (RB_UnderCap == UNDER_FULL＿OPEN)
+            {
+                // Debug.Log("bbb");
+                RB_AboveCap = ABOVE_CLOSE;
+            }
+            else if (RB_UnderCap == UNDER_CLOSE)
+            {
+                RB_AboveCap = ABOVE_FULL＿OPEN;
+            }
+            if (LB_UnderCap == UNDER_FULL＿OPEN)
+            {
+                LB_AboveCap = ABOVE_CLOSE;
+            }
+            else if (LB_UnderCap == UNDER_CLOSE)
+            {
+                LB_AboveCap = ABOVE_FULL＿OPEN;
+            }*/
+        }
+        //}
+        // 上昇準備 & 上昇中だったら
+        /*else
         {
             // 上昇が終わっていなかったら
             if (windManager.upFinish == false)
@@ -266,10 +299,10 @@ public class SendToEsp32 : MonoBehaviour
             }
             else
             {
-                // 上昇が終わったらふたがあく
+                // 上昇が終わったらふたがあく,多分いらない
                 LF_AboveCap = ABOVE_FULL＿OPEN; RF_AboveCap = ABOVE_FULL＿OPEN; RB_AboveCap = ABOVE_FULL＿OPEN; LB_AboveCap = ABOVE_FULL＿OPEN;
             }
-        }
+        }*/
     }
 
     /*
