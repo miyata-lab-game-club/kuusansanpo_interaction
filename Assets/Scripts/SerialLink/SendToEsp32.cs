@@ -49,9 +49,7 @@ public class SendToEsp32 : MonoBehaviour
     private string LF_Data;
 
     private string RF_Data;
-    private string RB_Data;
-    private string LB_Data;
-    private string NF_Data;
+    private string Wind_Data;
 
     private void Start()
     {
@@ -83,47 +81,33 @@ public class SendToEsp32 : MonoBehaviour
     private IEnumerator SendDataCoroutine(SerialPortManager spManager, WindManager windManager)
     {
         Debug.Log(GameManager.instance.gameTimer + "時間：状態" + GameManager.instance.isAblePlayingHard);
+        int lastRandomNumber = 0; // 前回のランダム値を保存
         while (true)  // 無限ループで送信処理を繰り返す
         {
             try
             {
-                // windManager.upが真なら1、偽なら0を格納
-                windBoostedRise = windManager.up ? "a" : "b";
-                SetPortIndices(windManager);
-                SetUnderPortIndices(windManager);
+                int randomNumber = UnityEngine.Random.Range(1, 4); // 1, 2, 3の中からランダムに選択
+                while (randomNumber == lastRandomNumber) // 前回と同じ数字が出ないようにする
+                {
+                    randomNumber = UnityEngine.Random.Range(1, 4);
+                }
+                lastRandomNumber = randomNumber; // 今回のランダム値を保存
 
-                // 力覚装置1~4s用に文字型に変換(引っ張る力と急上昇を送信)
-                //1つめにAbove, 2つめにUnder
-                LF_Data = LF_AboveCap.ToString() + LF_UnderCap.ToString() + windBoostedRise;
-                RF_Data = RF_AboveCap.ToString() + RF_UnderCap.ToString() + windBoostedRise;
-                //string tmpString = RB_AboveCap.ToString();
-                //Debug.Log(RB_AboveCap.ToString() + "型" + RB_AboveCap.ToString().GetType());
-                //RB_Data = RB_AboveCap.ToString() + RB_UnderCap.ToString();
-                RB_Data = RB_AboveCap.ToString() + RB_UnderCap.ToString() + windBoostedRise;
-                Debug.Log("RB_Data: " + RB_Data);
-                LB_Data = LB_AboveCap.ToString() + LB_UnderCap.ToString() + windBoostedRise;
+                // 送信データの作成
+                Wind_Data = randomNumber.ToString();
 
-                NF_Data = windManager.currentWindIndex.ToString() + windBoostedRise;
-                SetPortIndices(windManager);
-                SetUnderPortIndices(windManager);
-                // それぞれ送信
-                spManager.WriteToPort(0, LF_Data);//LFに送信
-                spManager.WriteToPort(1, RF_Data);//RFに送信
-                spManager.WriteToPort(2, RB_Data);//RBに送信
-                spManager.WriteToPort(3, LB_Data);//LBに送信
-                spManager.WriteToPort(4, NF_Data);//Neckfanに送信
+                // spManager.WriteToPort(0, Wind_Data);を使用して送信
+                spManager.WriteToPort(2, Wind_Data);
 
                 // spManager.Read(5)の結果をデバッグログで表示
+                // 例: Debug.Log(spManager.Read(5)); // 必要に応じてコメントアウトを解除してください
             }
             catch (Exception ex)
             {
                 Debug.LogError("Could not send to ESP32: " + ex.Message);
             }
 
-            yield return new WaitForSeconds(0.1f);  // 0.5秒待機
-                                                    //spManager.WriteToPort(2, RB_AboveCap.ToString());//RBに送信
-                                                    //yield return new WaitForSeconds(0.1f);  // 0.1秒待機
-                                                    //spManager.WriteToPort(2, LF_AboveCap.ToString());//RBに送信
+            yield return new WaitForSeconds(2f);  // 2秒ごとにループ
         }
     }
 
@@ -184,20 +168,7 @@ public class SendToEsp32 : MonoBehaviour
 
     // 上のふたの制御をする　上のふたに命令を送る
     private void SetUnderPortIndices(WindManager windManager)
-    {/*
-            private const int ABOVE_FULL＿OPEN = 6;
-
-    // ABOVE:全閉じ
-    private const int ABOVE_HALF＿OPEN = 5;
-
-    // ABOVE:全閉じ
-    private const int ABOVE_CLOSE = 4;
-        */
-        // 上：全部あいてる
-        // 上昇準備＆上昇中じゃなかったら
-        //if (windManager.sendToHardUpSignal == false)
-        //{
-        //Debug.Log(windManager.isMatchingFinal);
+    {
         if (windManager.isMatchingFinal == true)
         {
             if (LF_UnderCap == UNDER_FULL＿OPEN)

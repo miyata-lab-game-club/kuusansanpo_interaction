@@ -19,25 +19,19 @@ public class SerialPortManager : MonoBehaviour
     private string RF_Port = "COM2";
 
     [SerializeField]
-    private string RB_Port = "COM11";
+    private string Wind_Port = "COM5";
 
     [SerializeField]
-    private string LB_Port = "COM4";
+    private string kasa_Port = "COM6";
 
-    [SerializeField]
-    private string NF_Port = "COM5"; // s5をnfに変更
-
-    [SerializeField]
-    private string kasa_Port = "COM6"; // s6をkasaに変更
-
-    public SerialPort[] serialPorts = new SerialPort[6];
+    public SerialPort[] serialPorts = new SerialPort[4];
     public int baudRate = 115200;
 
-    private Thread[] threads = new Thread[6];
+    private Thread[] threads = new Thread[4];
     private bool isRunning_ = false;
 
-    private string[] messages = new string[6];
-    private bool[] isNewMessageReceived_ = new bool[6];
+    private string[] messages = new string[4];
+    private bool[] isNewMessageReceived_ = new bool[4];
 
     private void Awake()
     {
@@ -53,7 +47,7 @@ public class SerialPortManager : MonoBehaviour
 
     private void Update()
     {
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 4; i++)
         {
             if (isNewMessageReceived_[i] && OnDataReceived != null)
             {
@@ -71,8 +65,8 @@ public class SerialPortManager : MonoBehaviour
     // 通信ポートをすべて開く
     private void OpenAllPorts()
     {
-        string[] portNames = { LF_port, RF_Port, RB_Port, LB_Port, NF_Port, kasa_Port }; // s5とs6をnfとkasaに変更
-        for (int i = 0; i < 6; i++)
+        string[] portNames = { LF_port, RF_Port, Wind_Port, kasa_Port }; // s5とs6をnfとkasaに変更
+        for (int i = 0; i < 4; i++)
         {
             try
             {
@@ -95,7 +89,7 @@ public class SerialPortManager : MonoBehaviour
     private void CloseAllPorts()
     {
         isRunning_ = false;
-        for (int i = 0; i < 6; i++)
+        for (int i = 0; i < 4; i++)
         {
             if (threads[i] != null && threads[i].IsAlive)
             {
