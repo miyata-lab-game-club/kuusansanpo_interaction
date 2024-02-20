@@ -230,7 +230,7 @@ public class WindManager : MonoBehaviour
         {
             if (player.transform.position.y > startUpHeight && !up)
             {
-                Debug.Log(isMatchingFinal);
+                // Debug.Log(isMatchingFinal);
 
                 timer += Time.deltaTime;
 
@@ -422,7 +422,7 @@ public class WindManager : MonoBehaviour
         // currentWindIndex = Random.Range(1, 9);
 
         //ここに風の方向を入れる
-        int[] choices = { 1, 3, 5, 7 };
+        int[] choices = { 1, 2, 8 };
         int rand;
         if (isDemoMovie == false)
         {

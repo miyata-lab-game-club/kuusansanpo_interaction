@@ -11,36 +11,17 @@ public class SendToEsp32 : MonoBehaviour
     //public WindManager windManager;
 
     // Port４とネックファンは後で追加
-    private int LF_UnderCap;
+    private int LF_Hole;
 
-    private int RF_UnderCap;
-    private int RB_UnderCap;
-    private int LB_UnderCap;
-
-    private int LF_AboveCap = 4;
-    private int RF_AboveCap = 4;
-    private int RB_AboveCap = 4;
-    private int LB_AboveCap = 4;
+    private int RF_Hole;
 
     private bool sendAboveCapOpenSignalOnce = false;
 
-    // ABOVE:全開
-    private const int ABOVE_FULL＿OPEN = 4;
-
-    // ABOVE:全閉じ
-    private const int ABOVE_HALF＿OPEN = 5;
-
-    // ABOVE:全閉じ
-    private const int ABOVE_CLOSE = 6;
-
-    // UNDER:全開
-    private const int UNDER_FULL＿OPEN = 3;
+    // UNDER:閉じる
+    private const int CLOSE = 1;
 
     // UNDER:中くらい
-    private const int UNDER_HALF＿OPEN = 2;
-
-    // UNDER:閉じる
-    private const int UNDER_CLOSE = 1;
+    private const int OPEN = 2;
 
     // WindManagerのup(bool)をa or b　のstringにして格納するようの変数
     private string windBoostedRise;
@@ -111,254 +92,26 @@ public class SendToEsp32 : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
-    {
-        //Debug.Log("データ" + LF_Data);
-    }
-
     //caseの中でpullpowerを考慮してそれぞれ(LF_port~4)の力を決める
     private void SetPortIndices(WindManager windManager)
     {
-        /*
-        if(windManager.isMatching == false){
-            LF_power = CLOSE; RF_power = CLOSE; RB_power = CLOSE; LB_power = CLOSE;
-            return;
-        }*/
         switch (windManager.currentWindIndex)
         {
             case 0:
-                LF_UnderCap = UNDER_FULL＿OPEN; RF_UnderCap = UNDER_FULL＿OPEN; RB_UnderCap = UNDER_FULL＿OPEN; LB_UnderCap = UNDER_FULL＿OPEN;
+                LF_Hole = OPEN; RF_Hole = OPEN;
                 break;
-            /*
-            // 1が下のモータ閉める、2が半分、3が下のモータ開いて上がく。
-            */
+
             case 1://北(前)
-                LF_UnderCap = UNDER_FULL＿OPEN; RF_UnderCap = UNDER_FULL＿OPEN; RB_UnderCap = UNDER_CLOSE; LB_UnderCap = UNDER_CLOSE;
+                LF_Hole = CLOSE; RF_Hole = CLOSE;
                 break;
 
             case 2://北東(右前)
-                LF_UnderCap = UNDER_CLOSE; RF_UnderCap = UNDER_FULL＿OPEN; RB_UnderCap = UNDER_CLOSE; LB_UnderCap = UNDER_CLOSE;
-                break;
-
-            case 3://東(右)
-                LF_UnderCap = UNDER_CLOSE; RF_UnderCap = UNDER_FULL＿OPEN; RB_UnderCap = UNDER_FULL＿OPEN; LB_UnderCap = UNDER_CLOSE;
-                break;
-
-            case 4://南東(右後)
-                LF_UnderCap = UNDER_CLOSE; RF_UnderCap = UNDER_CLOSE; RB_UnderCap = UNDER_FULL＿OPEN; LB_UnderCap = UNDER_CLOSE;
-                break;
-
-            case 5://南(後)
-                LF_UnderCap = UNDER_CLOSE; RF_UnderCap = UNDER_CLOSE; RB_UnderCap = UNDER_FULL＿OPEN; LB_UnderCap = UNDER_FULL＿OPEN;
-                break;
-
-            case 6://南西(左後)
-                LF_UnderCap = UNDER_CLOSE; RF_UnderCap = UNDER_CLOSE; RB_UnderCap = UNDER_CLOSE; LB_UnderCap = UNDER_FULL＿OPEN;
-                break;
-
-            case 7://西(左)
-                LF_UnderCap = UNDER_FULL＿OPEN; RF_UnderCap = UNDER_CLOSE; RB_UnderCap = UNDER_CLOSE; LB_UnderCap = UNDER_FULL＿OPEN;
+                LF_Hole = OPEN; RF_Hole = CLOSE;
                 break;
 
             case 8://北西(左前)
-                LF_UnderCap = UNDER_FULL＿OPEN; RF_UnderCap = UNDER_CLOSE; RB_UnderCap = UNDER_CLOSE; LB_UnderCap = UNDER_CLOSE;
+                LF_Hole = CLOSE; RF_Hole = OPEN;
                 break;
         }
     }
-
-    // 上のふたの制御をする　上のふたに命令を送る
-    private void SetUnderPortIndices(WindManager windManager)
-    {
-        if (windManager.isMatchingFinal == true)
-        {
-            if (LF_UnderCap == UNDER_FULL＿OPEN)
-            {
-                LF_AboveCap = ABOVE_CLOSE;
-            }
-            /*else if (LF_UnderCap == UNDER_CLOSE)
-            {
-                LF_AboveCap = ABOVE_FULL＿OPEN;
-            }*/
-            if (RF_UnderCap == UNDER_FULL＿OPEN)
-            {
-                RF_AboveCap = ABOVE_CLOSE;
-            }/*
-                else if (RF_UnderCap == UNDER_CLOSE)
-                {
-                    RF_AboveCap = ABOVE_FULL＿OPEN;
-                }*/
-            if (RB_UnderCap == UNDER_FULL＿OPEN)
-            {
-                Debug.Log("aaa");
-                RB_AboveCap = ABOVE_CLOSE;
-            }/*
-                else if (RB_UnderCap == UNDER_CLOSE)
-                {
-                    RB_AboveCap = ABOVE_FULL＿OPEN;
-                }*/
-            if (LB_UnderCap == UNDER_FULL＿OPEN)
-            {
-                LB_AboveCap = ABOVE_CLOSE;
-            }
-            /*else if (LB_UnderCap == UNDER_CLOSE)
-            {
-                LB_AboveCap = ABOVE_FULL＿OPEN;
-            }*/
-        }
-        else
-        {
-            if (LF_UnderCap == UNDER_FULL＿OPEN)
-            {
-                LF_AboveCap = ABOVE_FULL＿OPEN;
-            }
-            if (RF_UnderCap == UNDER_FULL＿OPEN)
-            {
-                RF_AboveCap = ABOVE_FULL＿OPEN;
-            }
-            if (RB_UnderCap == UNDER_FULL＿OPEN)
-            {
-                // Debug.Log("bbb");
-                RB_AboveCap = ABOVE_FULL＿OPEN;
-            }
-            if (LB_UnderCap == UNDER_FULL＿OPEN)
-            {
-                LB_AboveCap = ABOVE_FULL＿OPEN;
-            }
-            /*if (LF_UnderCap == UNDER_FULL＿OPEN)
-            {
-                LF_AboveCap = ABOVE_CLOSE;
-            }
-            else if (LF_UnderCap == UNDER_CLOSE)
-            {
-                LF_AboveCap = ABOVE_FULL＿OPEN;
-            }
-            if (RF_UnderCap == UNDER_FULL＿OPEN)
-            {
-                RF_AboveCap = ABOVE_CLOSE;
-            }
-            else if (RF_UnderCap == UNDER_CLOSE)
-            {
-                RF_AboveCap = ABOVE_FULL＿OPEN;
-            }
-            if (RB_UnderCap == UNDER_FULL＿OPEN)
-            {
-                // Debug.Log("bbb");
-                RB_AboveCap = ABOVE_CLOSE;
-            }
-            else if (RB_UnderCap == UNDER_CLOSE)
-            {
-                RB_AboveCap = ABOVE_FULL＿OPEN;
-            }
-            if (LB_UnderCap == UNDER_FULL＿OPEN)
-            {
-                LB_AboveCap = ABOVE_CLOSE;
-            }
-            else if (LB_UnderCap == UNDER_CLOSE)
-            {
-                LB_AboveCap = ABOVE_FULL＿OPEN;
-            }*/
-        }
-        //}
-        // 上昇準備 & 上昇中だったら
-        /*else
-        {
-            // 上昇が終わっていなかったら
-            if (windManager.upFinish == false)
-            {
-                // 蓋が閉じる
-                LF_AboveCap = ABOVE_CLOSE; RF_AboveCap = ABOVE_CLOSE; RB_AboveCap = ABOVE_CLOSE; LB_AboveCap = ABOVE_CLOSE;
-            }
-            else
-            {
-                // 上昇が終わったらふたがあく,多分いらない
-                LF_AboveCap = ABOVE_FULL＿OPEN; RF_AboveCap = ABOVE_FULL＿OPEN; RB_AboveCap = ABOVE_FULL＿OPEN; LB_AboveCap = ABOVE_FULL＿OPEN;
-            }
-        }*/
-    }
-
-    /*
-    if(windManager.isMatching == false){
-        LF_power = CLOSE; RF_power = CLOSE; RB_power = CLOSE; LB_power = CLOSE;
-        return;
-    }*/
-
-    /*
-    if (windManager.isMatchingFinal == true)
-    {
-        switch (windManager.currentWindIndex)
-        {
-            // 1が下のモータ閉める、2が半分、3が下のモータ開いて上がく。
-            case 1://北(前)
-                LF_AboveCap = FULL＿OPEN; RF_AboveCap = FULL＿OPEN; RB_AboveCap = CLOSE; LB_AboveCap = CLOSE;
-                break;
-
-            case 2://北東(右前)
-                LF_AboveCap = CLOSE; RF_AboveCap = FULL＿OPEN; RB_AboveCap = CLOSE; LB_AboveCap = CLOSE;
-                break;
-
-            case 3://東(右)
-                LF_AboveCap = CLOSE; RF_AboveCap = FULL＿OPEN; RB_AboveCap = FULL＿OPEN; LB_AboveCap = CLOSE;
-                break;
-
-            case 4://南東(右後)
-                LF_AboveCap = CLOSE; RF_AboveCap = CLOSE; RB_AboveCap = FULL＿OPEN; LB_AboveCap = CLOSE;
-                break;
-
-            case 5://南(後)
-                LF_AboveCap = CLOSE; RF_AboveCap = CLOSE; RB_AboveCap = FULL＿OPEN; LB_AboveCap = FULL＿OPEN;
-                break;
-
-            case 6://南西(左後)
-                LF_AboveCap = CLOSE; RF_AboveCap = CLOSE; RB_AboveCap = CLOSE; LB_AboveCap = FULL＿OPEN;
-                break;
-
-            case 7://西(左)
-                LF_AboveCap = FULL＿OPEN; RF_AboveCap = CLOSE; RB_AboveCap = CLOSE; LB_AboveCap = FULL＿OPEN;
-                break;
-
-            case 8://北西(左前)
-                LF_AboveCap = FULL＿OPEN; RF_AboveCap = CLOSE; RB_AboveCap = CLOSE; LB_AboveCap = CLOSE;
-                break;
-        }
-    }
-    // 該当の箇所のふたを閉める
-    else
-    {
-        switch (windManager.currentWindIndex)
-        {
-            // 1が下のモータ閉める、2が半分、3が下のモータ開いて上がく。
-            case 1://北(前)
-                LF_AboveCap = CLOSE; RF_AboveCap = CLOSE; RB_AboveCap = FULL＿OPEN; LB_AboveCap = FULL＿OPEN;
-                break;
-
-            case 2://北東(右前)
-                LF_AboveCap = FULL＿OPEN; RF_AboveCap = CLOSE; RB_AboveCap = FULL＿OPEN; LB_AboveCap = FULL＿OPEN;
-                break;
-
-            case 3://東(右)
-                LF_AboveCap = FULL＿OPEN; RF_AboveCap = CLOSE; RB_AboveCap = FULL＿OPEN; LB_AboveCap = CLOSE;
-                break;
-
-            case 4://南東(右後)
-                LF_AboveCap = CLOSE; RF_AboveCap = CLOSE; RB_AboveCap = FULL＿OPEN; LB_AboveCap = CLOSE;
-                break;
-
-            case 5://南(後)
-                LF_AboveCap = CLOSE; RF_AboveCap = CLOSE; RB_AboveCap = FULL＿OPEN; LB_AboveCap = FULL＿OPEN;
-                break;
-
-            case 6://南西(左後)
-                LF_AboveCap = CLOSE; RF_AboveCap = CLOSE; RB_AboveCap = CLOSE; LB_AboveCap = FULL＿OPEN;
-                break;
-
-            case 7://西(左)
-                LF_AboveCap = FULL＿OPEN; RF_AboveCap = CLOSE; RB_AboveCap = CLOSE; LB_AboveCap = FULL＿OPEN;
-                break;
-
-            case 8://北西(左前)
-                LF_AboveCap = FULL＿OPEN; RF_AboveCap = CLOSE; RB_AboveCap = CLOSE; LB_AboveCap = CLOSE;
-                break;
-        }
-    }
-}*/
 }

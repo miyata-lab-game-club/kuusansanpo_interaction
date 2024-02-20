@@ -934,6 +934,7 @@ GameObject:
   - component: {fileID: 340929203}
   - component: {fileID: 340929202}
   - component: {fileID: 340929201}
+  - component: {fileID: 340929204}
   m_Layer: 0
   m_Name: SerialLink
   m_TagString: Untagged
@@ -984,10 +985,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   LF_port: COM9
   RF_Port: COM8
-  RB_Port: COM5
-  LB_Port: COM6
-  NF_Port: COM3
-  kasa_Port: COM4
+  Wind_Port: COM10
+  kasa_Port: COM14
   baudRate: 115200
 --- !u!114 &340929203
 MonoBehaviour:
@@ -999,6 +998,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e8fe249926f358e48bef994c494fd2c1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &340929204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 340929196}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627ba460f63e4b84fa2a4c7b09819321, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &349679525
@@ -1383,7 +1394,7 @@ MonoBehaviour:
   - {fileID: 1389707959}
   upHeight: 130
   startUpHeight: 110
-  windCicleTime: 20
+  windCicleTime: 10
   similarityStandard: 0.6
   windPivot: {fileID: 933590742}
   ReceiveFromEsp32: {fileID: 340929201}
