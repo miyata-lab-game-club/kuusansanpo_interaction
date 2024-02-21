@@ -983,8 +983,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5790cd01094f70440b169d2f35ba5902, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  LF_port: COM9
-  RF_Port: COM8
+  LF_port: COM8
+  RF_Port: COM9
   Wind_Port: COM10
   kasa_Port: COM14
   baudRate: 115200
@@ -1374,10 +1374,9 @@ MonoBehaviour:
   DirectionalLight: {fileID: 0}
   player: {fileID: 475872090}
   speed: 10
-  pullPower: 0
   up: 0
   downVeclocity: {x: 0, y: -1.5, z: 0}
-  upPower: 5
+  upPower: 1
   upVelocity: 5
   sendToHardUpSignal: 0
   centerEyeAnchor: {fileID: 1871310415}
@@ -1392,13 +1391,12 @@ MonoBehaviour:
   - {fileID: 1158412960}
   - {fileID: 1262495880}
   - {fileID: 1389707959}
-  upHeight: 130
+  upHeight: 200
   startUpHeight: 110
   windCicleTime: 10
   similarityStandard: 0.6
   windPivot: {fileID: 933590742}
   ReceiveFromEsp32: {fileID: 340929201}
-  currentWindIndex: 0
   windDirection:
   - {x: 0, y: 1, z: 0}
   - {x: 0, y: 1, z: 1}
@@ -1426,7 +1424,6 @@ MonoBehaviour:
   moveTimerText: {fileID: 1278190887}
   kasa_Port: {fileID: 121148154}
   isMatching: 0
-  isMatchingFinal: 0
   upFinish: 0
 --- !u!1001 &495427934
 PrefabInstance:
