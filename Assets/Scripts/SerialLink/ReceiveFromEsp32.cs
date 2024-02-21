@@ -6,6 +6,7 @@ public class ReceiveFromEsp32 : MonoBehaviour
 {
     public GameObject rotateObject;
     private Queue outputQueue;
+    public FetchAverageAngle fetchAverageAngle;
 
     public int buttonState = 9;  // buttonState変数
 
@@ -83,7 +84,7 @@ public class ReceiveFromEsp32 : MonoBehaviour
                     averageRotate.xRotate += tmpRotates[i].xRotate / targetFrame;
                     averageRotate.zRotate += tmpRotates[i].zRotate / targetFrame;
                 }
-                rotateObject.transform.eulerAngles = new Vector3(tmpRotate.xRotate, 0, tmpRotate.zRotate);
+                rotateObject.transform.eulerAngles = new Vector3(tmpRotate.xRotate, fetchAverageAngle.LatestAngle, tmpRotate.zRotate);
                 //Debug.Log("角度 " + averageRotate.xRotate+"," +averageRotate.zRotate);
                 // 初期化
                 tmpRotates = new Rotate[targetFrame];

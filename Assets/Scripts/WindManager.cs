@@ -56,7 +56,8 @@ public class WindManager : MonoBehaviour
     [SerializeField] private GameObject windPivot;
 
     [SerializeField] private ReceiveFromEsp32 ReceiveFromEsp32;// SerialPortManager の参照を持つ変数
-    public int currentWindIndex = 0;
+    private int currentWindIndex = 0;
+    public int CurrentWindIndex { get => CurrentWindIndex; set => CurrentWindIndex = value; }
 
     // ひとつ前の風の方向
     private int previousWindIndex = 1;
@@ -83,7 +84,7 @@ public class WindManager : MonoBehaviour
     public bool isMatching = false;
     public bool isMatchingFinal = false;
     private float judgeTimer = 0;
-    private float judgeTime = 3;
+    private float judgeTime = 1;
     private bool changeOnce = false;
 
     private const int UP_READY_TIME = 4;
@@ -103,7 +104,7 @@ public class WindManager : MonoBehaviour
         timer = 0;
         timerText.text = timer.ToString();
         currentWind = currentWindDirection();
-        SetWindEffectDirection(currentWindIndex);
+        SetWindEffectDirection(CurrentWindIndex);
         spManager = SerialPortManager.Instance;
 
         if (isDemo == false)
@@ -134,30 +135,10 @@ public class WindManager : MonoBehaviour
         }
         kasaVector = kasa_Port.transform.rotation;
 
-        // 引っ張る強さによってスピードが変わる
-        /*
-        if (pullPower == 3)
-        {
-            speed = 3;
-        }
-        else if (pullPower == 2)
-        {
-            speed = 2;
-        }
-        else
-        {
-            speed = 1;
-        }*/
-        //player.transform.forward = centerEyeAnchor.forward;
-        // 右コントローラーの傾き
-        // Quaternion rightControllerRotation = rightControllerTransform.rotation;
         Quaternion rightControllerRotation = kasaVector;
 
-        // 右コントローラーの傾きをベクトルにする
-        //rightControllerTilt = (rightControllerRotation * Vector3.forward).normalized;
         rightControllerTilt = kasa_Port.transform.up;
-        //Debug.Log(rightControllerTilt);
-        // xz平面に戻す
+
         rightControllerTilt.y = 0;
 
         heightText.text = this.transform.position.y.ToString();
@@ -167,7 +148,7 @@ public class WindManager : MonoBehaviour
             boost = true;
             timer = 0;
             twiceBoost = currentWindFromController();
-            SetActiveWindDirection(currentWindIndex);
+            SetActiveWindDirection(CurrentWindIndex);
         }
 
         //Debug.Log(ReceiveFromEsp32.buttonState);
@@ -178,7 +159,7 @@ public class WindManager : MonoBehaviour
             boost = true;
             timer = 0;
             twiceBoost = currentWindFromController();
-            SetActiveWindDirection(currentWindIndex);
+            SetActiveWindDirection(CurrentWindIndex);
         }
 
         Debug.DrawLine(new Vector3(-28, 9, -60), new Vector3(-28, 9, -60) + rightControllerTilt * 5, Color.red);
@@ -212,12 +193,9 @@ public class WindManager : MonoBehaviour
                 isMatchingFinal = false;
             }
 
-            Debug.Log("time" + timer + "3秒たって一致しているか" + isMatchingFinal);
             changeOnce = true;
             judgeTimer = 0;
         }
-
-        // １秒前に一致していない状態にする
     }
 
     private void FixedUpdate()
@@ -230,8 +208,6 @@ public class WindManager : MonoBehaviour
         {
             if (player.transform.position.y > startUpHeight && !up)
             {
-                // Debug.Log(isMatchingFinal);
-
                 timer += Time.deltaTime;
 
                 //Debug.Log("timer:"+timer+"windCicleTime:"+windCicleTime);
@@ -240,12 +216,9 @@ public class WindManager : MonoBehaviour
                     currentWind = currentWindDirection();
                     timer = 0;
                 }
-                // 上昇準備中と上昇中は操作を受け付けないようにする
-                //if (sendToHardUpSignal == false)
-                //{
-                //Debug.Log("操作を受け付ける");
+
                 float similarity;
-                similarity = Vector3.Dot(rightControllerTilt.normalized, windXZDirection[currentWindIndex].normalized);
+                similarity = Vector3.Dot(rightControllerTilt.normalized, windXZDirection[CurrentWindIndex].normalized);
                 // 類似度が0.7よりおおきいとき
                 //Debug.Log(similarity);
                 similarityText.text = similarity.ToString();
@@ -262,11 +235,6 @@ public class WindManager : MonoBehaviour
                         moveTimerText.enabled = false;
                         changeOnce = false;
                         judgeTimer = 0;
-                        //if (upFinish == false)
-                        //{
-                        //   upFinish = true;
-                        // Debug.Log("上昇中なら上昇終了準備");
-                        //}
                     }
 
                     if (isMatchingFinal == true)
@@ -284,92 +252,23 @@ public class WindManager : MonoBehaviour
                     // おちていく
                     playerRigidbody.velocity = downVeclocity;
                 }
-                //}
-                /*else
-                {
-                    Debug.Log(timer + "操作を受け付けない");
-                    playerRigidbody.velocity = downVeclocity;
-                }*/
             }
             else
             {
-                Debug.Log(timer + "操作を受け付けない");
             }
-            // 上昇する7秒前にハード側に信号を送る 110+7 117
-            /*if (startUpHeight + UP_READY_TIME * 1 > transform.position.y)
-            {
-                judgeTimer = 0;
-
-                moveTimerText.enabled = true;
-                moveTimerText.text = "上昇準備中";
-
-                // 信号を送る
-                Debug.Log("上昇準備開始 : 上昇中");
-                //Debug.Log("下に落ちる速度" + 1 + "上昇準備の高さ：" + UP_READY_TIME * 1);
-                //Debug.Log("上昇開始位置：" + (startUpHeight + UP_READY_TIME * 1));
-                sendToHardUpSignal = true;
-                upFinish = false;// 上昇が始まる
-            }*/
-            // 5mから20mまで上昇
-            /*if (player.transform.position.y < startUpHeight)
-            {
-                up = true;
-                Debug.Log("上昇中");
-            }*/
-            // 20mまで上昇したらとまる
-            /*if (player.transform.position.y > upHeight && up)
-            {
-                //上昇しきったらマッチングフラグをリセット
-                isMatching = false;
-                isMatchingFinal = false;
-
-                moveTimerText.enabled = false;
-
-                up = false;
-                //upOnce = false;
-                sendToHardUpSignal = false;
-
-                currentWind = currentWindDirection();
-                SetWindEffectDirection(currentWindIndex);
-                changeOnce = false;
-                timer = 0;
-                upFinish = true;
-            }*/
-            // 上昇中
-            /*if (up)
-            {
-                moveTimerText.enabled = true;
-                moveTimerText.text = "上昇中";
-
-                currentWindIndex = 0;
-                playerRigidbody.velocity = windDirection[currentWindIndex] * upPower;
-                SetActiveWindDirection(currentWindIndex);
-                SetWindEffectDirection(currentWindIndex);
-
-                //if (upOnce == false)
-                //{
-                //    currentWindIndex = 0;
-                    // Debug.Log("力を加える");
-                    //playerRigidbody.AddForce(windDirection[0], ForceMode.Impulse);
-                    //playerRigidbody.velocity = windDirection[0];
-                    // 風向きを音とエフェクトで提示
-                  //  windMovement.WindMove(currentWindIndex);
-                   // upOnce = true;
-                //}
-            }*/
         }
         else
         {
             timer += Time.deltaTime;
             if (timer < windCicleTime && twiceBoost)
             {
-                currentWind = windDirection[currentWindIndex];
+                currentWind = windDirection[CurrentWindIndex];
                 // 傾きに一番近い方向に風が吹く
                 playerRigidbody.velocity = new Vector3(currentWind.x * speed, currentWind.y, currentWind.z * speed);
             }
             else if (timer < windCicleTime && !twiceBoost)
             {
-                currentWind = windDirection[currentWindIndex];
+                currentWind = windDirection[CurrentWindIndex];
                 // 傾きに一番近い方向に風が吹く
                 playerRigidbody.velocity = currentWind * speed;
             }
@@ -386,25 +285,23 @@ public class WindManager : MonoBehaviour
     {
         float similarity;
         float maxSimilarity = -1;
-        int tmpCurrentWindIndex = currentWindIndex;
+        int tmpCurrentWindIndex = CurrentWindIndex;
         // 傾きと一番近い方向を割り出す
         for (int i = 1; i < windDirection.Length; i++)
         {
             rightControllerTilt.y = 0;
             similarity = Vector3.Dot(rightControllerTilt.normalized, windXZDirection[i].normalized);
-            /*Debug.Log("右コントローラーの傾き" + rightControllerTilt.normalized + "×" + windXZDirection[i].normalized);
-            Debug.Log("類似度" + similarity);*/
             if (similarity > maxSimilarity)
             {
                 maxSimilarity = similarity;
-                currentWindIndex = i;
+                CurrentWindIndex = i;
             }
         }
 
         // 風向きを音とエフェクトで提示
-        windMovement.WindMove(currentWindIndex);
+        windMovement.WindMove(CurrentWindIndex);
         similarityText.text = maxSimilarity.ToString();
-        if (tmpCurrentWindIndex == currentWindIndex)
+        if (tmpCurrentWindIndex == CurrentWindIndex)
         {
             return true;
         }
@@ -448,16 +345,16 @@ public class WindManager : MonoBehaviour
             rand = choices[tmpIndex];
         }
         // 現在の風を更新
-        currentWindIndex = rand;
+        CurrentWindIndex = rand;
         // ひとつ前の風を更新
-        previousWindIndex = currentWindIndex;
+        previousWindIndex = CurrentWindIndex;
         // UIの表示
-        SetActiveWindDirection(currentWindIndex);
+        SetActiveWindDirection(CurrentWindIndex);
         // 風向きを音とエフェクトで提示
-        windMovement.WindMove(currentWindIndex);
+        windMovement.WindMove(CurrentWindIndex);
         //風のエフェクトの向き設定
-        SetWindEffectDirection(currentWindIndex);
-        return windDirection[currentWindIndex].normalized;
+        SetWindEffectDirection(CurrentWindIndex);
+        return windDirection[CurrentWindIndex].normalized;
     }
 
     private void SetActiveWindDirection(int currentWindIndex)
@@ -489,7 +386,7 @@ public class WindManager : MonoBehaviour
     private void SetWindEffectDirection(int windindex)
     {
         Quaternion pivotRot;
-        switch (currentWindIndex)
+        switch (CurrentWindIndex)
         {
             case 0:
                 pivotRot = Quaternion.Euler(-90, 0, 0);

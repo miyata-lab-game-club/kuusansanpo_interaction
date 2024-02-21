@@ -970,6 +970,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rotateObject: {fileID: 121148154}
+  fetchAverageAngle: {fileID: 340929204}
   buttonState: 97
 --- !u!114 &340929202
 MonoBehaviour:

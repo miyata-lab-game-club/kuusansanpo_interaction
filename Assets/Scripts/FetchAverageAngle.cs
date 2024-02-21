@@ -4,38 +4,47 @@ using UnityEngine.Networking; // UnityのネットワーキングAPIを使用
 
 public class FetchAverageAngle : MonoBehaviour
 {
-    // FlaskサーバのURL
-    private string url = "http://127.0.0.1:5000/get_average_angle";
-
-    private void Start()
+    [System.Serializable] // この行を追加
+    public class AngleData // クラスを public に変更
     {
-        // サーバからデータを定期的に取得するコルーチンを開始
-        StartCoroutine(GetAverageAngleRepeatedly());
+        public string average_angle;
     }
 
-    private IEnumerator GetAverageAngleRepeatedly()
+    public float LatestAngle { get; private set; } // 外部からアクセス可能なプロパティ
+
+    private IEnumerator Start()
     {
-        // 無限ループでAPIを叩き続ける
         while (true)
         {
-            using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
-            {
-                // リクエストを送信し、レスポンスを待機
-                yield return webRequest.SendWebRequest();
+            yield return new WaitForSeconds(0.1f); // 0.1秒ごとにリクエスト
+            StartCoroutine(GetAngle());
+        }
+    }
 
-                if (webRequest.isNetworkError || webRequest.isHttpError)
+    private IEnumerator GetAngle()
+    {
+        using (UnityWebRequest webRequest = UnityWebRequest.Get("http://127.0.0.1:5000/get_average_angle"))
+        {
+            yield return webRequest.SendWebRequest();
+            if (webRequest.isNetworkError || webRequest.isHttpError)
+            {
+                Debug.Log(webRequest.error);
+            }
+            else
+            {
+                string response = webRequest.downloadHandler.text;
+                AngleData angleData = JsonUtility.FromJson<AngleData>(response);
+                if (float.TryParse(angleData.average_angle, out float parsedAngle))
                 {
-                    // ネットワークエラーまたはHTTPエラーが発生した場合
-                    Debug.Log("Error: " + webRequest.error);
+                    LatestAngle = parsedAngle; // パースされた数値をプロパティに格納
+                    // Debug.Log(LatestAngle);
+                    Debug.Log("角度:" + LatestAngle);
                 }
                 else
                 {
-                    // レスポンスから平均角度を取得してログ出力
-                    Debug.Log("Received: " + webRequest.downloadHandler.text);
+                    Debug.LogError("Failed to parse angle: " + angleData.average_angle);
                 }
             }
-            // 0.2秒待機
-            yield return new WaitForSeconds(0.2f);
         }
     }
 }
