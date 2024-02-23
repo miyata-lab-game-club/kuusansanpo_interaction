@@ -80,7 +80,7 @@ public class WindManager : MonoBehaviour
     public bool isMatching = false;
     private bool isMatchingFinal = false;
     private float judgeTimer = 0;
-    private float judgeTime = 1;
+    private float judgeTime = 3;
     private bool changeOnce = false;
 
     private const int UP_READY_TIME = 4;
@@ -122,6 +122,8 @@ public class WindManager : MonoBehaviour
         {
             sendToesp32.StartSendData(spManager, this);
         }
+        // sendToesp32.SendWindData(spManager, this);// 追加
+        // sendToesp32.SendSurboData(spManager, this);
     }
 
     private Vector3 rightControllerTilt;
@@ -129,6 +131,7 @@ public class WindManager : MonoBehaviour
 
     private void Update()
     {
+        /*
         //　テストコード
         timer += Time.deltaTime;
         // 3秒ごとにサーボモータに信号を送る
@@ -146,9 +149,8 @@ public class WindManager : MonoBehaviour
                 index = 0;
             }
             timer = 0;
-        }
+        }*/
 
-        /*
         if (GameManager.instance.isPlaying == false)
         {
             return;
@@ -207,7 +209,8 @@ public class WindManager : MonoBehaviour
                 IsMatchingFinal = true;
                 // 変更できないようにする
                 // データを送る
-                sendToesp32.SendDataOnce(spManager, this);// 追加
+                //sendToesp32.SendWindData(spManager, this);// 追加
+                // sendToesp32.SendSurboData(spManager, this);
             }
             else
             {
@@ -221,30 +224,23 @@ public class WindManager : MonoBehaviour
         }
 
         // １秒前に一致していない状態にする
-        */
     }
 
     private void FixedUpdate()
     {
-        /*
         if (GameManager.instance.isPlaying == false)
         {
             return;
         }
         if (boost != true)
         {
-            // if (player.transform.position.y > startUpHeight && !up)
-            // {
-            // Debug.Log(isMatchingFinal);
-
             timer += Time.deltaTime;
 
-            //Debug.Log("timer:"+timer+"windCicleTime:"+windCicleTime);
             if (timer > windCicleTime)
             {
                 // 風を変更
                 currentWind = currentWindDirection();
-                sendToesp32.SendDataOnce(spManager, this);// 追加
+                Debug.Log(timer + ":風が変わって閉じる");
                 timer = 0;
             }
             // 上昇準備中と上昇中は操作を受け付けないようにする
@@ -253,16 +249,17 @@ public class WindManager : MonoBehaviour
             //Debug.Log("操作を受け付ける");
             float similarity;
             similarity = Vector3.Dot(rightControllerTilt.normalized, windXZDirection[CurrentWindIndex].normalized);
-            // 類似度が0.7よりおおきいとき
-            //Debug.Log(similarity);
+
             similarityText.text = similarity.ToString();
+            // 類似度が0.7よりおおきいとき
             if (similarity >= similarityStandard)
             {
                 isMatching = true;
                 moveTimerText.enabled = true;
                 moveTimerText.text = judgeTimer.ToString("f1");
 
-                if (timer > windCicleTime - 1)
+                // 次の風が来る0.5秒前に信号を送る
+                if (timer > windCicleTime - 0.5f)
                 {
                     //isMatching = false;　// 念のため
                     IsMatchingFinal = false;
@@ -312,7 +309,7 @@ public class WindManager : MonoBehaviour
                 timer = 0;
                 boost = false;
             }
-        }*/
+        }
     }
 
     // コントローラーの向いている方向に風を吹かせる
@@ -470,5 +467,10 @@ public class WindManager : MonoBehaviour
                 windPivot.transform.rotation = pivotRot;
                 break;
         }
+    }
+
+    private void OnApplicationQuit()
+    {
+        spManager.WriteToPort(2, "9");
     }
 }
