@@ -244,6 +244,7 @@ public class WindManager : MonoBehaviour
             {
                 // 風を変更
                 currentWind = currentWindDirection();
+                Debug.Log(timer + "風を変更");
                 timer = 0;
             }
 
@@ -304,9 +305,13 @@ public class WindManager : MonoBehaviour
             // 20mまで上昇したらとまる
             if (player.transform.position.y > endUpHeight && up)
             {
+                Debug.Log("達した");
                 up = false;
                 upOnce = false;
                 IsMatchingFinal = false;
+                // 風とタイマーの更新
+                timer = 0;
+                currentWind = currentWindDirection();
             }
             // 上昇中
             if (up)
@@ -488,6 +493,11 @@ public class WindManager : MonoBehaviour
     {
         spManager.WriteToPort(2, "9");
         spManager.WriteToPort(2, "9");
+        spManager.WriteToPort(2, "9");
+        spManager.WriteToPort(0, "2");
+        spManager.WriteToPort(1, "2");
+        spManager.WriteToPort(0, "2");
+        spManager.WriteToPort(1, "2");
         spManager.WriteToPort(0, "2");
         spManager.WriteToPort(1, "2");
     }

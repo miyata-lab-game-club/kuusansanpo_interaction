@@ -9,6 +9,8 @@ public class ReceiveFromEsp32 : MonoBehaviour
 
     public int buttonState = 9;  // buttonState変数
 
+    [SerializeField] private FetchAverageAngle fetchAverageAngle;
+
     private void Start()
     {
         outputQueue = Queue.Synchronized(new Queue());
@@ -60,6 +62,12 @@ public class ReceiveFromEsp32 : MonoBehaviour
 
     private void Update()
     {
+        //FetchAverageAngle angleInstance = new FetchAverageAngle();
+        // Row_angleプロパティに値を設定
+
+        // Row_angleプロパティから値を取得して表示
+        float currentAngle = fetchAverageAngle.Row_angle;
+
         if (outputQueue.Count != 0)
         {
             int[] rotate = (int[])outputQueue.Dequeue();  // ここをfloatからintに変更
@@ -83,8 +91,8 @@ public class ReceiveFromEsp32 : MonoBehaviour
                     averageRotate.xRotate += tmpRotates[i].xRotate / targetFrame;
                     averageRotate.zRotate += tmpRotates[i].zRotate / targetFrame;
                 }
-                rotateObject.transform.eulerAngles = new Vector3(tmpRotate.xRotate, 0, tmpRotate.zRotate);
-                //Debug.Log("角度 " + averageRotate.xRotate+"," +averageRotate.zRotate);
+                rotateObject.transform.eulerAngles = new Vector3(tmpRotate.xRotate, currentAngle - 40, tmpRotate.zRotate);
+                // Debug.Log("角度 " + tmpRotate.xRotate + "," + currentAngle + "," + tmpRotate.zRotate);
                 // 初期化
                 tmpRotates = new Rotate[targetFrame];
                 frame = 0;
